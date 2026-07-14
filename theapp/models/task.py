@@ -1,7 +1,7 @@
 from sqlalchemy import Column,Integer,ForeignKey,String,Enum as SQLEnum
 from database import Base
 from sqlalchemy.orm import relationship
-from enum import Enum
+from enums import TaskStatus
 
 
 class Task (Base) :
@@ -27,14 +27,10 @@ class Task (Base) :
         String
     )
 
-    class stts (str, Enum) :
-        pending = "pending"
-        in_progress = "in_progress"
-        completed = "completed"
 
     status =Column(
-        SQLEnum(stts),
-        default= stts.pending,
+        SQLEnum(TaskStatus),
+        default= TaskStatus.pending,
         nullable= False
     )
 
