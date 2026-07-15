@@ -32,7 +32,7 @@ class Project (Base) :
 
     tasks = relationship(
         "Task",
-        back_populates="project"
+        back_populates="project",
         cascade="all, delete-orphan"
     )
 
