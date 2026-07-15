@@ -10,11 +10,11 @@ def user_reg (db: Session ,data: UserCreate) :
 
     if exist_un :
         raise HTTPException(
-            status_code= 400,
+            status_code= 409,
             detail="username already existed")
     if exist_em :
         raise HTTPException(
-            status_code= 400,
+            status_code= 409,
             detail="email already existed")
     
     new_user = User(
