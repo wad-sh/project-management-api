@@ -1,5 +1,5 @@
 from sqlalchemy import Column,Integer,ForeignKey,String,Enum as SQLEnum
-from database import Base
+from database.database import Base
 from sqlalchemy.orm import relationship
 from enums import TaskStatus
 
