@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.task import Task
-from utils.taskstools import *
+from models.project import Project
 from schemas.task import *
 from fastapi import HTTPException
 
@@ -10,7 +10,7 @@ def get_tasks(db: Session,proj_id:int,user_id:int) :
     
     if not proj_is_for_user(db,user_id,proj_id) :
         raise HTTPException(
-            status_code=409,
+            status_code=404,
             detail="not allowed or project not found"
         )
     
@@ -20,7 +20,7 @@ def get_tasks(db: Session,proj_id:int,user_id:int) :
 def add_task(db: Session,user_id:int,proj_id:int,task_data: TaskCreate) : 
     if not proj_is_for_user(db,user_id,proj_id) :
         raise HTTPException(
-            status_code=409,
+            status_code=404,
             detail="not allowed or project not found"
         )
     new_task = Task(
@@ -33,57 +33,51 @@ def add_task(db: Session,user_id:int,proj_id:int,task_data: TaskCreate) :
     db.refresh(new_task)
     return new_task
 
-def up_task(db: Session,user_id:int,proj_id:int,task_id: int,task_data: TaskUp) : 
-    if not proj_is_for_user(db,user_id,proj_id) :
-        raise HTTPException(
-                status_code=403,
-                detail="not allowed or project not found"
-            )
-    
-    if not is_this_task_for_proj(db,proj_id,task_id):
-        raise HTTPException(
-            status_code=403,
-            detail="not allowed or task not found"
-        )
-
+def up_task(db: Session,user_id:int,task_id: int,task_data: TaskUp) : 
+    tsk = get_and_check_task(db,user_id,task_id)
     if task_data.title is None and task_data.description is None and task_data.status is None :
-        raise HTTPException(
-                status_code=400,
-                detail="no change"
-            )
-
-    tsk = db.query(Task).filter(Task.id == task_id).first()
-    
+        raise HTTPException (
+            status_code=400,
+            detail="no change"
+        )
     if task_data.title is not None :
-        tsk.title =task_data.title
+        tsk.title = task_data.title
+
     if task_data.description is not None :
-        tsk.description =task_data.description
+        tsk.description = task_data.description
+
     if task_data.status is not None :
-        tsk.status =task_data.status
+        tsk.status = task_data.status
 
     db.commit()
     db.refresh(tsk)
-        
-
     return tsk
 
 
-def delete_task(db: Session,user_id:int,proj_id:int,task_id: int) : 
-    if not proj_is_for_user(db,proj_id,user_id) :
-        raise HTTPException(
-                status_code=409,
-                detail="not allowed or project not found"
-            )
-    
-    if not is_this_task_for_proj(db,proj_id,task_id):
-        raise HTTPException(
-            status_code=409,
-            detail="not allowed or task not found"
-        )
-    
-    tsk = db.query(Task).filter(Task.id == task_id).first()
-
+def delete_task(db: Session,user_id:int,task_id: int) : 
+    tsk = get_and_check_task(db,user_id,task_id)
     db.delete(tsk)
     db.commit()
+    return tsk
 
+def proj_is_for_user (db: Session,user_id:int,proj_id:int) :
+    pj = db.query(Project).filter(
+        Project.id == proj_id,
+        Project.owner_id == user_id
+    ).first()
+    
+    return pj is not None
+
+def get_and_check_task(db: Session,user_id:int,task_id:int) :
+    tsk = db.query(Task).filter(Task.id == task_id).first()
+    if not tsk :
+        raise HTTPException(
+            status_code=404,
+            detail="task not found"
+        )
+    if  tsk.project.owner_id  != user_id :
+        raise HTTPException(
+            status_code=403,
+            detail="not allowed"
+        )
     return tsk

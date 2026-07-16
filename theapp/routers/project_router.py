@@ -24,8 +24,5 @@ def update_pj (id: int , user_id: int , data: ProjUp , db: Session = Depends(get
 
 @router.delete ("/{id}",response_model=ProjResp)
 def delete_pj (id: int , user_id: int, db: Session = Depends(get_db)) :
-    delete_p(db,id,user_id)
-    return {
-    "message": "deleted successfully"
-}
-
+    return delete_p(db,id,user_id)
+    
