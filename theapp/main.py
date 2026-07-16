@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from database import Base , engine
+from database.database import Base , engine
 from routers.user_router import router as user_router
 from routers.project_router import router as project_router
 from routers.task_router import router1, router2
