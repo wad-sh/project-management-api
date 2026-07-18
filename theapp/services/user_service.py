@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from utils.security import *
+from auth.security import *
 from models.user import *
 from schemas.user import *
+from auth.jwt_handler import create_access_token
 
 def user_reg (db: Session ,data: UserCreate) :
     exist_un = db.query(User).filter(User.username == data.username).first()
@@ -41,4 +42,12 @@ def user_login (db: Session, data: UserLogin) :
             status_code=400,
             detail="Incorrect email or password"
         )
-    return u
+    
+    token = create_access_token(
+        {"sub" : str(u.id)}
+    )
+
+    return {
+        "access_token" : token,
+        "token_type" : "bearer"
+    }
