@@ -4,6 +4,7 @@ from auth.security import *
 from models.user import *
 from schemas.user import *
 from auth.jwt_handler import create_access_token
+from fastapi.security import OAuth2PasswordRequestForm
 
 def user_reg (db: Session ,data: UserCreate) :
     exist_un = db.query(User).filter(User.username == data.username).first()
@@ -30,8 +31,8 @@ def user_reg (db: Session ,data: UserCreate) :
     return new_user
 
 
-def user_login (db: Session, data: UserLogin) :
-    u = db.query(User).filter(User.email == data.email).first()
+def user_login (db: Session, data: OAuth2PasswordRequestForm) :
+    u = db.query(User).filter(User.email == data.username).first()
     if not u :
         raise HTTPException(
             status_code= 400,

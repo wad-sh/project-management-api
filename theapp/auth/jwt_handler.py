@@ -17,12 +17,12 @@ def create_access_token(data: dict) :
 
 def verify_token (token: str) :
     try:
-        dec = jwt.decode(
+        payload = jwt.decode(
             token,
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
-        return dec
+        return payload
     except JWTError:
         return None
 

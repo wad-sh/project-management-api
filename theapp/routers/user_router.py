@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends
-from schemas.user import *
+from schemas.user import UserCreate,UserResponse
 from database.database import get_db
 from services.user_service import user_reg,user_login
 from sqlalchemy.orm import Session
 from schemas.token import Token
+from auth.dependencies import get_curr_u
+from fastapi.security import OAuth2PasswordRequestForm
+# from models.user import User
+
 
 router = APIRouter(
     prefix="/users",
@@ -17,7 +21,14 @@ def register (data: UserCreate,
 
 @router.post("/login", response_model= Token) 
 def login (
-    data: UserLogin,
+    data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ) :
     return user_login(db, data)
+
+
+# @router.get("/me")
+# def get_me(
+#     current_user: User = Depends(get_curr_u)
+# ):
+#     return current_user
