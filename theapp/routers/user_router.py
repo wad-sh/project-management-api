@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from schemas.token import Token
 from auth.dependencies import get_curr_u
 from fastapi.security import OAuth2PasswordRequestForm
-# from models.user import User
+
 
 
 router = APIRouter(
@@ -25,10 +25,3 @@ def login (
     db: Session = Depends(get_db)
 ) :
     return user_login(db, data)
-
-
-# @router.get("/me")
-# def get_me(
-#     current_user: User = Depends(get_curr_u)
-# ):
-#     return current_user
