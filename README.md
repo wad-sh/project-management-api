@@ -65,7 +65,7 @@ cd ProjectManagementAPI
 Create a virtual environment:
 
 ```bash
-python -m venv venv
+py -m venv venv
 ```
 
 Activate the virtual environment:
